@@ -1,0 +1,15 @@
+{
+  "id": "/",
+  "name": "Smart Display",
+  "short_name": "Smart Display",
+  "description": "Add and remove shopping items and to-dos with your voice.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#10141c",
+  "theme_color": "#10141c",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#10141c">
+  <title>Smart Display</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="apple-touch-icon" href="/icons/icon-180.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Smart Display">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-state="idle">
+  <header class="header">
+    <a class="brand" href="/" aria-label="Smart Display home"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>Smart Display</a>
+    <button id="installButton" class="install-button" hidden>Install app</button>
+  </header>
+  <p id="installHelp" class="app-notice" hidden>In Safari, open Share → Add to Home Screen → Add.</p>
+  <p id="offlineNotice" class="app-notice" role="status" hidden>You’re offline. Connect to the internet to send voice commands.</p>
+  <main aria-label="Voice control">
+    <span class="state-label" id="stateLabel">Ready</span>
+    <div class="voice-stage">
+      <div class="halo" aria-hidden="true"></div>
+      <div class="orbit" aria-hidden="true"></div>
+          <button id="recordButton" aria-label="Hold to speak; release to send" aria-describedby="recordHint">
+            <svg class="mic-icon" viewBox="0 0 48 48" fill="none" aria-hidden="true"><rect x="17" y="6" width="14" height="25" rx="7" stroke="currentColor" stroke-width="2.5"/><path d="M11 23v2a13 13 0 0 0 26 0v-2M24 38v6M18 44h12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+            <svg class="check-icon" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="m12 25 8 8 17-19" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+          </button>
+    </div>
+    <h1 id="buttonTitle">Hold to speak</h1>
+    <p id="recordHint">Add or remove an item with your voice.<br>Release to send.</p>
+    <div class="feedback" role="status" aria-live="polite" aria-atomic="true"><p id="status"></p></div>
+    <p class="keyboard-hint">You can also hold <kbd>Space</kbd> when the button is focused.</p>
+  </main>
+  <script src="app.js"></script>
+  <script src="pwa.js"></script>
+</body>
+</html>
