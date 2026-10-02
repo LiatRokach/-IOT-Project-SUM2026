@@ -102,7 +102,7 @@ app.post(
         : req.file.mimetype;
 
       const response = await generateWithRetry({
-        model: "gemini-3.8-flash",
+        model: "gemini-3.5-flash-lite",
 
         contents: [
           {
