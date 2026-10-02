@@ -42,6 +42,7 @@ const extraOrigins = (process.env.CORS_ORIGIN || "")
 app.use(
   cors({
     origin: [
+      "https://iot-smart-display.netlify.app",
       "http://127.0.0.1:5500",
       "http://localhost:5500",
       "http://127.0.0.1:3000",
