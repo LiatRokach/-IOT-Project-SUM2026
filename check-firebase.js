@@ -1,11 +1,18 @@
 // Tests a temporary, isolated path; never sends a command to the ESP32.
 import "dotenv/config";
-import { applicationDefault, initializeApp, deleteApp } from "firebase-admin/app";
+import { applicationDefault, cert, initializeApp, deleteApp } from "firebase-admin/app";
 import { getDatabase } from "firebase-admin/database";
 import { nextCommand, waitForStatus } from "./commands.js";
 import assert from "node:assert/strict";
 
-const app = initializeApp({ credential: applicationDefault(), databaseURL: process.env.FIREBASE_DATABASE_URL });
+if (!process.env.FIREBASE_DATABASE_URL) throw new Error("Missing FIREBASE_DATABASE_URL");
+if (!process.env.FIREBASE_SERVICE_ACCOUNT && !process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+  throw new Error("Missing FIREBASE_SERVICE_ACCOUNT or GOOGLE_APPLICATION_CREDENTIALS");
+}
+const credential = process.env.FIREBASE_SERVICE_ACCOUNT
+  ? cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT))
+  : applicationDefault();
+const app = initializeApp({ credential, databaseURL: process.env.FIREBASE_DATABASE_URL });
 const db = getDatabase(app);
 const ref = db.ref("_integrationChecks").push();
 const deadline = setTimeout(() => {

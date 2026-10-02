@@ -35,6 +35,11 @@
     <div class="feedback" role="status" aria-live="polite" aria-atomic="true"><p id="status"></p></div>
     <p class="keyboard-hint">You can also hold <kbd>Space</kbd> when the button is focused.</p>
   </main>
+  <script>
+    window.API_BASE = ["localhost", "127.0.0.1"].includes(location.hostname)
+      ? "http://localhost:3000"
+      : "https://YOUR-SERVICE.up.railway.app";
+  </script>
   <script src="app.js"></script>
   <script src="pwa.js"></script>
 </body>

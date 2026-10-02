@@ -1,0 +1,8 @@
+[build]
+  command = "mkdir -p dist && cp index.html app.js style.css pwa.js sw.js manifest.webmanifest dist/ && cp -R icons dist/"
+  publish = "dist"
+
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache"

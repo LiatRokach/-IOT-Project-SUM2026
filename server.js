@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import multer from "multer";
 import cors from "cors";
 import { GoogleGenAI } from "@google/genai";
-import { applicationDefault, initializeApp } from "firebase-admin/app";
+import { applicationDefault, cert, initializeApp } from "firebase-admin/app";
 import { getDatabase } from "firebase-admin/database";
 import { fileURLToPath } from "node:url";
 import { validateCommand, nextCommand, waitForStatus } from "./commands.js";
@@ -13,10 +13,16 @@ dotenv.config();
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
 const HOST = process.env.HOST || (process.env.NODE_ENV === "production" ? "0.0.0.0" : "127.0.0.1");
-for (const name of ["GEMINI_API_KEY", "FIREBASE_DATABASE_URL", "GOOGLE_APPLICATION_CREDENTIALS"]) {
-  if (!process.env[name]) throw new Error(`Missing ${name} in .env`);
+for (const name of ["GEMINI_API_KEY", "FIREBASE_DATABASE_URL"]) {
+  if (!process.env[name]) throw new Error(`Missing ${name}`);
 }
-initializeApp({ credential: applicationDefault(), databaseURL: process.env.FIREBASE_DATABASE_URL });
+if (!process.env.FIREBASE_SERVICE_ACCOUNT && !process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+  throw new Error("Missing FIREBASE_SERVICE_ACCOUNT or GOOGLE_APPLICATION_CREDENTIALS");
+}
+const credential = process.env.FIREBASE_SERVICE_ACCOUNT
+  ? cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT))
+  : applicationDefault();
+initializeApp({ credential, databaseURL: process.env.FIREBASE_DATABASE_URL });
 const database = getDatabase();
 
 // Serve only public assets, never .env or server credentials.
@@ -29,12 +35,18 @@ for (const [route, file] of [["/", "index.html"], ["/app.js", "app.js"], ["/styl
   });
 }
 
-// Allow our local frontend to communicate with the backend
+const extraOrigins = (process.env.CORS_ORIGIN || "")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
 app.use(
   cors({
     origin: [
       "http://127.0.0.1:5500",
-      "http://localhost:5500"
+      "http://localhost:5500",
+      "http://127.0.0.1:3000",
+      "http://localhost:3000",
+      ...extraOrigins
     ]
   })
 );

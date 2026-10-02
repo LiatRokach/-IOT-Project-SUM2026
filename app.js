@@ -1,6 +1,8 @@
 const recordButton = document.getElementById("recordButton");
 const statusText = document.getElementById("status");
-const apiBase = location.port === "5500" ? "http://localhost:3000" : "";
+const apiBase = window.API_BASE ?? (
+  ["localhost", "127.0.0.1"].includes(location.hostname) ? "http://localhost:3000" : ""
+);
 let recorder;
 let holding = false;
 let busy = false;

@@ -3,10 +3,10 @@
 Run `npm install`, configure `.env`, then run `npm start` and open http://127.0.0.1:3000.
 
 Required environment variables: `GEMINI_API_KEY`, `FIREBASE_DATABASE_URL`, and
-`GOOGLE_APPLICATION_CREDENTIALS` (absolute path to the service account JSON file,
-stored outside this directory). Firebase can stay in locked mode: only the backend
-uses the Admin SDK. The server binds to the local computer; remote hosting needs
-authentication before exposing these API endpoints.
+either `GOOGLE_APPLICATION_CREDENTIALS` (local: absolute path to the service
+account JSON, stored outside this directory) or `FIREBASE_SERVICE_ACCOUNT`
+(production: the JSON contents as a secret). Firebase can stay in locked mode:
+only the backend uses the Admin SDK.
 
 Hold the button to record, then release. Gemini's validated result is written to
 `/command` as `{ "type": "add", "item": "tomato", "list": "shopping", "runningCount": 1 }`.
@@ -44,23 +44,33 @@ Run `npm test` for local protocol tests. `node check-firebase.js` tests real Fir
 access using a temporary `_integrationChecks` child, then removes that child.
 It does not write to the real `/command` or `/status` paths.
 
-## Install on a phone (PWA)
+## Deploy (Netlify frontend + Railway backend)
 
-Deploy the entire Node application behind HTTPS. A static-only host cannot run
-Gemini requests or Firebase Admin. Install dependencies with `npm ci` and start
-with `npm start`. Set `NODE_ENV=production`; the server uses the host's `PORT` and
-binds to `0.0.0.0`. No frontend build step is needed.
+Do not use your Mac path for `GOOGLE_APPLICATION_CREDENTIALS` in production.
+Never commit `.env` or the Firebase JSON file.
 
-Set `GEMINI_API_KEY` and `FIREBASE_DATABASE_URL` in your host's secret environment
-settings. Upload the Firebase service-account JSON using its private secret-file
-facility, and set `GOOGLE_APPLICATION_CREDENTIALS` to that file's absolute path on
-**the production server**, not your Mac's path. Never commit this file or `.env`.
-See `.env.example` for variable names.
+**Railway (API):** set the root to this folder, start with `npm start`, and add:
 
-Before making a deployment public, protect `/api/*` with authentication or your
-host's access controls. These endpoints currently have no user authentication;
-anyone who can reach them can submit Gemini requests and Firebase commands.
-The PWA conversion does not add account management.
+- `NODE_ENV=production`
+- `GEMINI_API_KEY`
+- `FIREBASE_DATABASE_URL`
+- `FIREBASE_SERVICE_ACCOUNT` — paste the **full JSON** from the Desktop service-account file (not the file path)
+- `CORS_ORIGIN` — your Netlify URL, for example `https://your-site.netlify.app`
+
+Do not set `GOOGLE_APPLICATION_CREDENTIALS` on Railway. After deploy, copy the
+public URL (`https://….up.railway.app`) into `index.html` (`window.API_BASE`).
+
+**Netlify (PWA):** connect this repo. `netlify.toml` copies only static files into
+`dist` (not `server.js` or secrets). After the site exists, set Railway
+`CORS_ORIGIN` to that HTTPS URL.
+
+Do not proxy `/api/*` through Netlify; voice + display confirmation can exceed
+Netlify's proxy timeout. The browser talks to Railway directly.
+
+Before making a deployment public, protect `/api/*`. These endpoints currently
+have no user authentication; anyone who can reach them can submit Gemini
+requests and Firebase commands. The PWA conversion does not add account
+management.
 
 After deployment, open the HTTPS URL on your phone:
 
