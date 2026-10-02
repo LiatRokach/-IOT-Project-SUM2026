@@ -97,6 +97,9 @@ app.post(
       console.log("Type:", req.file.mimetype);
 
       const audioBase64 = req.file.buffer.toString("base64");
+      const mimeType = /^audio\/mp4(?:;|$)/i.test(req.file.mimetype)
+        ? "audio/m4a"
+        : req.file.mimetype;
 
       const response = await generateWithRetry({
         model: "gemini-3.8-flash",
@@ -127,7 +130,7 @@ Do not return explanations.
 
               {
                 inlineData: {
-                  mimeType: req.file.mimetype,
+                  mimeType,
                   data: audioBase64
                 }
               }
@@ -153,7 +156,12 @@ Do not return explanations.
       if (!result.committed) throw new Error("Command was not saved.");
       res.json(result.snapshot.val());
     } catch (error) {
-      console.error("Voice command error:", error.code ?? error.status ?? error.name);
+      console.error("Voice command error:", {
+        name: error.name,
+        code: error.code,
+        status: error.status,
+        message: error.message
+      });
 
       res.status(500).json({
         error: "Could not process or send the command. Check Firebase before retrying."
